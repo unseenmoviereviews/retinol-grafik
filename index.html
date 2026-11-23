@@ -4,70 +4,103 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>График ввода ретинола Celimax</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#f4eee6">
 <style>
 :root{
-  --bg:#f6f4f0;--card:#fff;--ink:#1f1d1a;--mute:#6b665e;--line:#e4dfd6;
-  --R:#d9822b;--RR:#b8462e;--O:#4f8a6e;--E:#3d7bb0;--P:#8a5bb0;
+  --bg:#f4eee6;--bg2:#ede4d8;--card:rgba(255,252,247,.82);--ink:#2a211c;--mute:#8a7d72;--line:#e2d6c7;
+  --gold:#b08d57;--gold2:#d8bf91;
+  --R:#c98b74;--RR:#7d3b3f;--O:#93a38c;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --sans:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
 @media (prefers-color-scheme:dark){
-  :root{--bg:#161514;--card:#211f1d;--ink:#f1ede6;--mute:#a39d93;--line:#34312d;}
+  :root{--bg:#17120f;--bg2:#211a16;--card:rgba(38,30,25,.85);--ink:#f3e9dc;--mute:#a8998a;--line:#3a2f28;--gold:#d4b483;--gold2:#8f744c;--R:#b97a64;--RR:#94484d;--O:#7f907a}
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-.wrap{max-width:760px;margin:0 auto;padding:16px 14px 40px}
-h1{font-size:22px;margin:8px 0 4px}
-h2{font-size:18px;margin:26px 0 8px}
-p.sub{color:var(--mute);margin:0 0 14px;font-size:14px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;margin:10px 0 4px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.dot{width:12px;height:12px;border-radius:3px;display:inline-block;flex:none}
-.today-btn{margin:12px 0 0;width:100%;padding:12px;border:0;border-radius:12px;background:var(--ink);color:var(--bg);font-size:16px;font-weight:600}
-.week{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
-.week h3{margin:0 0 2px;font-size:16px}
-.week .note{margin:0 0 10px;color:var(--mute);font-size:13px}
-.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-.day{appearance:none;border:0;border-radius:10px;padding:6px 2px 7px;color:#fff;font:inherit;
-  display:flex;flex-direction:column;align-items:center;min-height:58px;cursor:pointer;position:relative}
-.day .wd{font-size:11px;opacity:.85}
-.day .dn{font-size:17px;font-weight:700;line-height:1.1}
-.day .tg{font-size:10px;font-weight:600;letter-spacing:.02em}
-.day.done::after{content:"✓";position:absolute;top:2px;right:5px;font-size:12px;font-weight:700}
-.day.half::after{content:"½";position:absolute;top:2px;right:5px;font-size:11px;font-weight:700}
-.day.is-today{outline:3px solid var(--ink);outline-offset:1px}
-.day.sel{transform:scale(.94)}
-.R{background:var(--R)}.RR{background:var(--RR)}.O{background:var(--O)}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px}
-.panel h4{margin:0 0 2px;font-size:17px}
-.panel .ph{color:var(--mute);font-size:13px;margin:0 0 10px}
-.panel h5{margin:12px 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
-.panel ol{margin:0;padding-left:20px}
-.panel li{margin:3px 0}
-.chk{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
-.chk.on{border-color:var(--O)}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--O);color:#fff;padding:12px 18px;border-radius:14px;font-size:15px;font-weight:600;max-width:calc(100% - 32px);text-align:center;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:9}
+body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);font-weight:400;letter-spacing:.005em;
+  background:radial-gradient(120% 60% at 100% 0%,var(--bg2) 0%,transparent 60%),radial-gradient(90% 50% at 0% 100%,var(--bg2) 0%,transparent 60%),var(--bg);background-attachment:fixed;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:28px 18px 56px}
+.eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin:6px 0 14px;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold2),transparent)}
+h1{font:500 clamp(40px,11vw,64px)/.95 var(--serif);margin:0 0 14px;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--gold);font-weight:400}
+h2{font:500 30px/1.1 var(--serif);margin:44px 0 14px;letter-spacing:-.005em}
+h2::before{content:"";display:block;width:28px;height:1px;background:var(--gold);margin-bottom:12px}
+p.sub{color:var(--mute);margin:0 0 22px;font-size:14px;max-width:46ch}
+.progress{margin:0 0 22px;padding:16px 18px;border:1px solid var(--line);border-radius:20px;background:var(--card);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.progress .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.progress .lbl{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute)}
+.progress .num{font:500 28px/1 var(--serif);white-space:nowrap}
+.progress .num small{font:400 13px var(--sans);color:var(--mute)}
+.bar{height:3px;background:var(--line);border-radius:3px;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width .5s ease}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;margin:0 0 18px;color:var(--mute);letter-spacing:.02em}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.today-btn{width:100%;padding:16px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:500 13px var(--sans);letter-spacing:.24em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 30px -12px rgba(42,33,28,.45);transition:transform .15s}
+.today-btn:active{transform:scale(.98)}
+.week{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px 14px 16px;margin:16px 0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 18px 40px -30px rgba(80,55,35,.35)}
+.week h3{margin:0 4px 2px;font:500 22px/1.15 var(--serif);display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.week h3 span{font:400 11px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.week .note{margin:4px 4px 14px;color:var(--mute);font-size:13px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{appearance:none;border:0;border-radius:16px;padding:8px 2px 9px;color:#fff;font:inherit;display:flex;flex-direction:column;align-items:center;min-height:66px;cursor:pointer;position:relative;transition:transform .15s,box-shadow .2s;box-shadow:0 6px 16px -10px rgba(60,30,20,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+.day .wd{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.day .dn{font:500 22px/1.05 var(--serif)}
+.day .tg{font-size:10px;font-weight:600;letter-spacing:.06em;opacity:.95}
+.day.done::after,.day.half::after{position:absolute;top:-5px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#fff;font:600 10px/18px var(--sans);text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.day.done::after{content:"✓"}
+.day.half::after{content:"½";background:var(--gold2)}
+.day.is-today{outline:1.5px solid var(--gold);outline-offset:3px}
+.day.sel{transform:translateY(-2px) scale(.97)}
+.R{background:linear-gradient(160deg,#d7a08b,var(--R))}.RR{background:linear-gradient(160deg,#9a5054,var(--RR))}.O{background:linear-gradient(160deg,#aebaa6,var(--O))}
+.dot.R,.dot.RR,.dot.O{box-shadow:none}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:12px;animation:rise .25s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel h4{margin:0;font:500 26px/1.1 var(--serif)}
+.panel .ph{color:var(--gold);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin:4px 0 6px}
+.panel h5{margin:16px 0 6px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--mute);font-weight:500}
+.panel ol{margin:0;padding-left:0;list-style:none;counter-reset:s}
+.panel li{margin:0;padding:8px 0 8px 34px;position:relative;border-bottom:1px solid var(--line);font-size:14px}
+.panel li:last-child{border-bottom:0}
+.panel li::before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;left:0;top:8px;font:italic 500 16px var(--serif);color:var(--gold)}
+.chks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.chk{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:13px 10px;border:1px solid var(--line);border-radius:999px;cursor:pointer;transition:all .2s;user-select:none;-webkit-user-select:none}
+.chk input{position:absolute;opacity:0;pointer-events:none}
+.chk::before{content:"";width:14px;height:14px;border-radius:50%;border:1px solid var(--gold);flex:none;transition:all .2s}
+.chk.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chk.on::before{background:var(--gold);border-color:var(--gold);box-shadow:inset 0 0 0 3px var(--ink)}
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%) translateY(-24px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:18px;font:italic 500 18px/1.25 var(--serif);width:max-content;max-width:calc(100% - 32px);text-align:center;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:9;box-shadow:0 16px 40px -14px rgba(0,0,0,.5)}
+.toast::before{content:"✦ ";color:var(--gold)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.chk input{width:22px;height:22px}
-.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
-.box ul{margin:6px 0 0;padding-left:20px}
-.box li{margin:4px 0}
-.warn{border-left:4px solid var(--RR)}
-small{color:var(--mute)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin:12px 0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.box ul,.box ol{margin:0;padding-left:18px}
+.box li{margin:8px 0;font-size:14px}
+.box li::marker{color:var(--gold)}
+.warn{border-left:2px solid var(--gold)}
+small{color:var(--mute);font-size:12px;display:block;margin-top:10px}
+footer{margin-top:48px;text-align:center;font:italic 400 15px var(--serif);color:var(--mute)}
+footer::before{content:"✦";display:block;color:var(--gold);font-style:normal;margin-bottom:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>График ввода ретинола</h1>
-  <p class="sub">Старт 23 ноября 2026, восемь недель, вместе с Базироном АС 2,5%. Нажмите на день, чтобы увидеть шаги и отметить утро и вечер. ½ на дне — отмечено что-то одно, ✓ — оба.</p>
+  <div class="eyebrow">Skin ritual · 8 недель</div>
+  <h1>Ретинол <em>без спешки</em></h1>
+  <p class="sub">С 23 ноября 2026, вместе с Базироном АС 2,5%. Нажмите на день — откроются шаги и отметки утра и вечера. ½ — отмечено одно, ✓ — оба.</p>
+  <div class="progress"><div class="row"><span class="lbl">Пройдено</span><span class="num" id="progNum">0 <small>из 112</small></span></div><div class="bar"><i id="progBar"></i></div></div>
 
   <div class="legend">
     <span><i class="dot R"></i>Р — ретинол</span>
     <span><i class="dot RR"></i>Р+Б — ретинол + бустер ретиналь</span>
     <span><i class="dot O"></i>В — восстановление</span>
   </div>
-  <button class="today-btn" id="todayBtn">Что делать сегодня</button>
+  <button class="today-btn" id="todayBtn">Мой уход сегодня</button>
   <div id="panelTop"></div>
 
   <div id="weeks"></div>
@@ -111,6 +144,7 @@ small{color:var(--mute)}
     <small>Базирон — только на участки с высыпаниями, недели 1–2 через утро. При сильном шелушении убрать его на 1–2 дня.</small>
   </div>
 </div>
+<footer>Красота любит регулярность</footer>
 
 <script>
 (function(){
@@ -172,7 +206,8 @@ small{color:var(--mute)}
   var tTimer=null;
   function toast(t){var el=document.getElementById("toast");el.textContent=t;el.classList.add("show");clearTimeout(tTimer);tTimer=setTimeout(function(){el.classList.remove("show")},2600)}
   function pick(a){return a[Math.floor(Math.random()*a.length)]}
-  function mark(btn,k){var m=!!done[k+"-m"],e=!!done[k+"-e"];btn.classList.toggle("done",m&&e);btn.classList.toggle("half",m!==e)}
+  function prog(){var n=Object.keys(done).filter(function(x){return /-[me]$/.test(x)}).length;var a=document.getElementById("progNum"),b=document.getElementById("progBar");if(a)a.innerHTML=n+" <small>из 112</small>";if(b)b.style.width=Math.min(100,n/112*100)+"%"}
+  function mark(btn,k){prog();var m=!!done[k+"-m"],e=!!done[k+"-e"];btn.classList.toggle("done",m&&e);btn.classList.toggle("half",m!==e)}
 
   function dateOf(w,i){var d=new Date(START);d.setDate(d.getDate()+w*7+i);return d}
   function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
@@ -188,7 +223,7 @@ small{color:var(--mute)}
   WEEKS.forEach(function(wk,w){
     var sec=document.createElement("section");sec.className="week";
     var d0=dateOf(w,0),d6=dateOf(w,6);
-    sec.innerHTML="<h3>"+wk.t+" · "+d0.getDate()+" "+MON[d0.getMonth()]+" – "+d6.getDate()+" "+MON[d6.getMonth()]+"</h3><p class='note'></p>";
+    sec.innerHTML="<h3>"+wk.t+"<span>"+d0.getDate()+" "+MON[d0.getMonth()]+" — "+d6.getDate()+" "+MON[d6.getMonth()]+"</span></h3><p class='note'></p>";
     sec.querySelector(".note").textContent=wk.n;
     var grid=document.createElement("div");grid.className="days";
     var panel=document.createElement("div");
@@ -215,10 +250,10 @@ small{color:var(--mute)}
     var withB=w>=2||i%2===1;
     var morning=MORNING_BASE.slice();
     if(withB)morning.splice(2,0,MORNING_B);
-    var h="<h4>"+WD[i]+", "+d.getDate()+" "+MON[d.getMonth()]+"</h4><p class='ph'>"+WEEKS[w].t+" · "+NAME[type]+"</p>";
+    var h="<p class='ph'>"+WEEKS[w].t+" · "+NAME[type]+"</p><h4>"+WD[i]+", "+d.getDate()+" "+MON[d.getMonth()]+"</h4>";
     h+="<h5>Утро</h5><ol>"+morning.map(function(s){return "<li></li>"}).join("")+"</ol>";
     h+="<h5>Вечер</h5><ol>"+EVENING[type].map(function(s){return "<li></li>"}).join("")+"</ol>";
-    h+="<label class='chk'><input type='checkbox' data-p='m'> Утро сделано</label><label class='chk'><input type='checkbox' data-p='e'> Вечер сделан</label>";
+    h+="<div class='chks'><label class='chk'><input type='checkbox' data-p='m'>Утро</label><label class='chk'><input type='checkbox' data-p='e'>Вечер</label></div>";
     p.innerHTML=h;
     var lis=p.querySelectorAll("ol");
     lis[0].querySelectorAll("li").forEach(function(li,j){li.textContent=morning[j]});
