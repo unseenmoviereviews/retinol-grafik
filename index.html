@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>График ввода ретинола Celimax</title>
+<style>
+:root{
+  --bg:#f6f4f0;--card:#fff;--ink:#1f1d1a;--mute:#6b665e;--line:#e4dfd6;
+  --R:#d9822b;--RR:#b8462e;--O:#4f8a6e;--E:#3d7bb0;--P:#8a5bb0;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#161514;--card:#211f1d;--ink:#f1ede6;--mute:#a39d93;--line:#34312d;}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:22px;margin:8px 0 4px}
+h2{font-size:18px;margin:26px 0 8px}
+p.sub{color:var(--mute);margin:0 0 14px;font-size:14px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;margin:10px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:3px;display:inline-block;flex:none}
+.today-btn{margin:12px 0 0;width:100%;padding:12px;border:0;border-radius:12px;background:var(--ink);color:var(--bg);font-size:16px;font-weight:600}
+.week{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.week h3{margin:0 0 2px;font-size:16px}
+.week .note{margin:0 0 10px;color:var(--mute);font-size:13px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day{appearance:none;border:0;border-radius:10px;padding:6px 2px 7px;color:#fff;font:inherit;
+  display:flex;flex-direction:column;align-items:center;min-height:58px;cursor:pointer;position:relative}
+.day .wd{font-size:11px;opacity:.85}
+.day .dn{font-size:17px;font-weight:700;line-height:1.1}
+.day .tg{font-size:10px;font-weight:600;letter-spacing:.02em}
+.day.done::after{content:"✓";position:absolute;top:2px;right:5px;font-size:12px;font-weight:700}
+.day.is-today{outline:3px solid var(--ink);outline-offset:1px}
+.day.sel{transform:scale(.94)}
+.R{background:var(--R)}.RR{background:var(--RR)}.O{background:var(--O)}.E{background:var(--E)}.P{background:var(--P)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px}
+.panel h4{margin:0 0 2px;font-size:17px}
+.panel .ph{color:var(--mute);font-size:13px;margin:0 0 10px}
+.panel h5{margin:12px 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+.panel ol{margin:0;padding-left:20px}
+.panel li{margin:3px 0}
+.chk{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:15px}
+.chk input{width:22px;height:22px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
+.box ul{margin:6px 0 0;padding-left:20px}
+.box li{margin:4px 0}
+.warn{border-left:4px solid var(--RR)}
+small{color:var(--mute)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>График ввода ретинола</h1>
+  <p class="sub">Старт 23 ноября 2026, восемь недель. Нажмите на день, чтобы увидеть шаги утром и вечером и отметить выполненное.</p>
+
+  <div class="legend">
+    <span><i class="dot R"></i>Р — ретинол</span>
+    <span><i class="dot RR"></i>Р+Б — ретинол + бустер ретиналь</span>
+    <span><i class="dot O"></i>В — восстановление</span>
+    <span><i class="dot E"></i>Э — энзимная пудра</span>
+    <span><i class="dot P"></i>П — пилинг Icon Skin</span>
+  </div>
+  <button class="today-btn" id="todayBtn">Что делать сегодня</button>
+  <div id="panelTop"></div>
+
+  <div id="weeks"></div>
+
+  <h2>Правила, если кожа возмутилась</h2>
+  <div class="box warn">
+    <ul>
+      <li>Лёгкое пощипывание первые минуты после бустера и сыворотки бывает из-за микрочастиц A-Shot, производитель об этом предупреждает.</li>
+      <li>Жжение, которое не проходит, мокнущие участки, сильное шелушение: 2–3 вечера только восстановление (зелёные дни), затем вернуться на этап назад.</li>
+      <li>Кислоты, витамин C и ретиноиды в один вечер не смешивать. Пилинг ставить только между двумя вечерами без ретинола.</li>
+      <li>SPF каждое утро, даже зимой и в пасмурную погоду.</li>
+      <li>При беременности и кормлении ретиноиды не используют — тогда график не подходит.</li>
+    </ul>
+  </div>
+
+  <h2>Что отложить</h2>
+  <div class="box">
+    <ul>
+      <li>Round Lab Soybean тонер — вызвал высыпания, из ухода убран.</li>
+      <li>Elizavecca AHA/BHA тонер — на время привыкания отложить: в нём гликолевая, молочная и салициловая кислоты, а эту роль уже выполняет пилинг Icon Skin. Можно вернуть через 2–3 месяца вместо пилинга, но не вместе с ним.</li>
+    </ul>
+  </div>
+
+  <h2>Расчёт на 8 недель</h2>
+  <div class="box">
+    <ul>
+      <li>Вечеров с ретинолом: 35 (по неделям 4 · 3 · 5 · 5 · 5 · 4 · 5 · 4). Из них 4 вечера вместе с бустером ретиналя.</li>
+      <li>Вечеров восстановления: 15, энзимная пудра: 4 раза, пилинг Icon Skin: 2 раза (через 14 дней — реже, чем 1 раз в 7–10 дней по инструкции, потому что идёт ретинол).</li>
+      <li>Сыворотка ретинол, 30 мл: при расходе около 0,2–0,3 мл за вечер уйдёт примерно 7–10 мл, флакона хватит ещё на 2–3 месяца ежедневного применения.</li>
+      <li>Бустер ретиналь, 15 мл: 4 точечных нанесения — меньше 1 мл.</li>
+      <li>Утро с витамином C: недели 3–4 — по 4 утра, недели 5–8 — каждое утро, кроме двух дней пилинга.</li>
+    </ul>
+    <small>Расход на одно нанесение — оценка, на упаковках он не указан.</small>
+  </div>
+
+  <h2>Утро, каждый день</h2>
+  <div class="box">
+    <ol id="morningList"></ol>
+    <small>Сыворотка Art\Fact с витамином C подключается с 3-й недели — через утро, с 5-й недели ежедневно, кроме утра перед пилингом. Перед первым применением смешать фазы по вкладышу, хранить в холодильнике, крем — через 15 минут после сыворотки.</small>
+  </div>
+</div>
+
+<script>
+(function(){
+  var START = new Date(2026,10,23); // 23 ноября 2026, понедельник
+  var WD = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+  var MON = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+  var TAG = {R:"Р",RR:"Р+Б",O:"В",E:"Э",P:"П"};
+  var NAME = {R:"Вечер с ретинолом",RR:"Вечер ретинол + бустер",O:"Вечер восстановления",E:"Энзимная пудра + восстановление",P:"Пилинг Icon Skin"};
+
+  // По неделям: 7 вечеров, Пн..Вс
+  var WEEKS = [
+    {t:"Неделя 1",n:"Ретинол через вечер, капля около 4 мм — как указано в инструкции. Никаких кислот и пудры.",d:["R","O","R","O","R","O","R"]},
+    {t:"Неделя 2",n:"Тот же ритм. Если кожа спокойна, можно наносить на всё лицо, обходя веки и крылья носа.",d:["O","R","O","R","O","R","O"]},
+    {t:"Неделя 3",n:"Ретинол 5 вечеров. Появляется энзимная пудра раз в неделю и витамин C через утро.",d:["R","R","E","R","R","O","R"]},
+    {t:"Неделя 4",n:"Закрепляем 5 вечеров ретинола.",d:["R","R","E","R","R","O","R"]},
+    {t:"Неделя 5",n:"Ретинол почти каждый вечер. Витамин C утром можно ежедневно.",d:["R","R","E","R","R","R","O"]},
+    {t:"Неделя 6",n:"Первый пилинг Icon Skin: 3 минуты. До и после него вечер без ретинола.",d:["R","O","P","O","R","R","R"]},
+    {t:"Неделя 7",n:"Подключаем бустер с ретиналем 2 вечера в неделю, точечно.",d:["RR","R","E","RR","R","O","R"]},
+    {t:"Неделя 8",n:"Второй пилинг (4 минуты). Бустер 2 раза. Дальше бустер можно довести до 3–4 вечеров.",d:["RR","O","P","O","RR","R","R"]}
+  ];
+
+  var MORNING_BASE = [
+    "Умывание: ICON SKIN Skinbiom (крем-гель для умывания) или просто прохладная вода",
+    "ARAVIA Bio-Repair тоник",
+    "TENZERO Green Tangerine крем для глаз",
+    "JIGOTT гель алоэ тонким слоем, сверху JIGOTT Goat Milk крем",
+    "FRUDIA Cicaderm SPF — обязательно"
+  ];
+  var MORNING_C = "ART\\FACT сыворотка с витамином C 15% — после тоника, подождать 2–3 минуты";
+
+  var EVENING = {
+    R:[
+      "Умывание ICON SKIN Skinbiom, промокнуть насухо, подождать 10–15 минут",
+      "CELIMAX Dual Barrier тонер, дать впитаться (керамиды смягчают ретинол)",
+      "CELIMAX Retinol Shot сыворотка — недели 1–2 капля около 4 мм (так в инструкции), затем чуть больше; не наносить на веки, уголки губ и крылья носа",
+      "Через 5–10 минут JIGOTT Goat Milk крем"
+    ],
+    RR:[
+      "Умывание ICON SKIN Skinbiom, промокнуть насухо, подождать 10–15 минут",
+      "CELIMAX Retinal Shot бустер — точечно, 1–2 капли на лоб, межбровье, носогубные складки",
+      "CELIMAX Retinol Shot сыворотка — тонко на остальное лицо",
+      "Через 5–10 минут JIGOTT Goat Milk крем"
+    ],
+    O:[
+      "Умывание ICON SKIN Skinbiom",
+      "CELIMAX Dual Barrier тонер, можно в 2 слоя",
+      "JIGOTT гель алоэ",
+      "JIGOTT Goat Milk крем"
+    ],
+    E:[
+      "Умывание ARAVIA Stop-Acne энзимной пудрой вместо Skinbiom: вспенить на влажной ладони, мягко 30–60 секунд, смыть. В ней папаин и азелаиновая кислота",
+      "CELIMAX Dual Barrier тонер",
+      "JIGOTT гель алоэ",
+      "JIGOTT Goat Milk крем"
+    ],
+    P:[
+      "Умывание ICON SKIN Skinbiom, кожа должна быть полностью сухой",
+      "ICON SKIN пилинг с витамином C и кислотами 15%: первый раз 3 минуты, во второй 4. При сильном жжении смыть сразу",
+      "Смыть прохладной водой",
+      "ARAVIA Bio-Repair тоник → гель алоэ → JIGOTT Goat Milk крем"
+    ]
+  };
+
+  function store(){try{return JSON.parse(localStorage.getItem("uhod-done")||"{}")}catch(e){return {}}}
+  function save(o){try{localStorage.setItem("uhod-done",JSON.stringify(o))}catch(e){}}
+  var done = store();
+
+  function dateOf(w,i){var d=new Date(START);d.setDate(d.getDate()+w*7+i);return d}
+  function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
+  function today(){var t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate())}
+
+  var weeksEl=document.getElementById("weeks");
+  var mList=document.getElementById("morningList");
+  MORNING_BASE.forEach(function(s,i){var li=document.createElement("li");li.textContent=s;mList.appendChild(li);if(i===1){var c=document.createElement("li");c.textContent=MORNING_C+" (с 3-й недели)";mList.appendChild(c)}});
+
+  var tKey=key(today());
+  var selBtn=null;
+
+  WEEKS.forEach(function(wk,w){
+    var sec=document.createElement("section");sec.className="week";
+    var d0=dateOf(w,0),d6=dateOf(w,6);
+    sec.innerHTML="<h3>"+wk.t+" · "+d0.getDate()+" "+MON[d0.getMonth()]+" – "+d6.getDate()+" "+MON[d6.getMonth()]+"</h3><p class='note'></p>";
+    sec.querySelector(".note").textContent=wk.n;
+    var grid=document.createElement("div");grid.className="days";
+    var panel=document.createElement("div");
+    wk.d.forEach(function(type,i){
+      var d=dateOf(w,i),k=key(d);
+      var b=document.createElement("button");
+      b.className="day "+type+(done[k]?" done":"")+(k===tKey?" is-today":"");
+      b.id="d-"+k;
+      b.innerHTML="<span class='wd'>"+WD[i]+"</span><span class='dn'>"+d.getDate()+"</span><span class='tg'>"+TAG[type]+"</span>";
+      b.addEventListener("click",function(){show(panel,w,i,b)});
+      grid.appendChild(b);
+    });
+    sec.appendChild(grid);sec.appendChild(panel);
+    weeksEl.appendChild(sec);
+  });
+
+  function show(panel,w,i,btn){
+    document.querySelectorAll(".panel").forEach(function(p){p.remove()});
+    if(selBtn)selBtn.classList.remove("sel");
+    if(selBtn===btn){selBtn=null;return}
+    selBtn=btn;btn.classList.add("sel");
+    var type=WEEKS[w].d[i],d=dateOf(w,i),k=key(d);
+    var p=document.createElement("div");p.className="panel";
+    var withC=w>=2&&(w>=4||i%2===0)&&type!=="P";
+    var morning=MORNING_BASE.slice();
+    if(withC)morning.splice(2,0,MORNING_C);
+    var h="<h4>"+WD[i]+", "+d.getDate()+" "+MON[d.getMonth()]+"</h4><p class='ph'>"+WEEKS[w].t+" · "+NAME[type]+"</p>";
+    h+="<h5>Утро</h5><ol>"+morning.map(function(s){return "<li></li>"}).join("")+"</ol>";
+    h+="<h5>Вечер</h5><ol>"+EVENING[type].map(function(s){return "<li></li>"}).join("")+"</ol>";
+    h+="<label class='chk'><input type='checkbox'> Сделано</label>";
+    p.innerHTML=h;
+    var lis=p.querySelectorAll("ol");
+    lis[0].querySelectorAll("li").forEach(function(li,j){li.textContent=morning[j]});
+    lis[1].querySelectorAll("li").forEach(function(li,j){li.textContent=EVENING[type][j]});
+    var cb=p.querySelector("input");cb.checked=!!done[k];
+    cb.addEventListener("change",function(){if(cb.checked)done[k]=1;else delete done[k];save(done);btn.classList.toggle("done",cb.checked)});
+    panel.appendChild(p);
+    p.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+
+  document.getElementById("todayBtn").addEventListener("click",function(){
+    var t=today(),diff=Math.round((t-START)/864e5);
+    if(diff<0||diff>=56){
+      var top=document.getElementById("panelTop");
+      top.innerHTML="<div class='box'>"+(diff<0?"График начинается 23 ноября 2026.":"Восемь недель позади. Дальше: ретинол каждый вечер, бустер 3–4 вечера, энзимы раз в неделю, пилинг раз в 2 недели между вечерами без ретинола.")+"</div>";
+      return;
+    }
+    var w=Math.floor(diff/7),i=diff%7;
+    var btn=document.getElementById("d-"+key(t));
+    btn.scrollIntoView({behavior:"smooth",block:"center"});
+    btn.click();
+  });
+})();
+</script>
+</body>
+</html>
