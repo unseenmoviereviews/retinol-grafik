@@ -35,6 +35,7 @@ p.sub{color:var(--mute);margin:0 0 14px;font-size:14px}
 .day .dn{font-size:17px;font-weight:700;line-height:1.1}
 .day .tg{font-size:10px;font-weight:600;letter-spacing:.02em}
 .day.done::after{content:"✓";position:absolute;top:2px;right:5px;font-size:12px;font-weight:700}
+.day.half::after{content:"½";position:absolute;top:2px;right:5px;font-size:11px;font-weight:700}
 .day.is-today{outline:3px solid var(--ink);outline-offset:1px}
 .day.sel{transform:scale(.94)}
 .R{background:var(--R)}.RR{background:var(--RR)}.O{background:var(--O)}
@@ -44,7 +45,10 @@ p.sub{color:var(--mute);margin:0 0 14px;font-size:14px}
 .panel h5{margin:12px 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
 .panel ol{margin:0;padding-left:20px}
 .panel li{margin:3px 0}
-.chk{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:15px}
+.chk{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.chk.on{border-color:var(--O)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--O);color:#fff;padding:12px 18px;border-radius:14px;font-size:15px;font-weight:600;max-width:calc(100% - 32px);text-align:center;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:9}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .chk input{width:22px;height:22px}
 .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
 .box ul{margin:6px 0 0;padding-left:20px}
@@ -56,7 +60,7 @@ small{color:var(--mute)}
 <body>
 <div class="wrap">
   <h1>График ввода ретинола</h1>
-  <p class="sub">Старт 23 ноября 2026, восемь недель, вместе с Базироном АС 2,5%. Нажмите на день, чтобы увидеть шаги утром и вечером и отметить выполненное.</p>
+  <p class="sub">Старт 23 ноября 2026, восемь недель, вместе с Базироном АС 2,5%. Нажмите на день, чтобы увидеть шаги и отметить утро и вечер. ½ на дне — отмечено что-то одно, ✓ — оба.</p>
 
   <div class="legend">
     <span><i class="dot R"></i>Р — ретинол</span>
@@ -67,6 +71,7 @@ small{color:var(--mute)}
   <div id="panelTop"></div>
 
   <div id="weeks"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <h2>Правила, если кожа возмутилась</h2>
   <div class="box warn">
@@ -160,6 +165,14 @@ small{color:var(--mute)}
   function store(){try{return JSON.parse(localStorage.getItem("uhod-done")||"{}")}catch(e){return {}}}
   function save(o){try{localStorage.setItem("uhod-done",JSON.stringify(o))}catch(e){}}
   var done = store();
+  Object.keys(done).forEach(function(k){if(!/-[me]$/.test(k)){done[k+"-m"]=1;done[k+"-e"]=1;delete done[k]}});
+  var PRAISE_M=["Утро сделано, вы молодец!","Отличное начало дня. Кожа скажет спасибо","Есть утро! Так держать","Умница: утренний уход на месте","Красота! SPF надет, день можно начинать"];
+  var PRAISE_E=["Вечер сделан. Вы большой молодец!","Отлично, кожа восстанавливается, пока вы спите","Ещё один вечер в копилку. Горжусь!","Супер! Дисциплина — ваша сильная сторона","Готово! Можно спокойно ложиться спать"];
+  var PRAISE_DAY=["Весь день закрыт. Вы просто молодец!","И утро, и вечер — идеальный день!","Полный день ухода. Так держать!"];
+  var tTimer=null;
+  function toast(t){var el=document.getElementById("toast");el.textContent=t;el.classList.add("show");clearTimeout(tTimer);tTimer=setTimeout(function(){el.classList.remove("show")},2600)}
+  function pick(a){return a[Math.floor(Math.random()*a.length)]}
+  function mark(btn,k){var m=!!done[k+"-m"],e=!!done[k+"-e"];btn.classList.toggle("done",m&&e);btn.classList.toggle("half",m!==e)}
 
   function dateOf(w,i){var d=new Date(START);d.setDate(d.getDate()+w*7+i);return d}
   function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
@@ -182,7 +195,7 @@ small{color:var(--mute)}
     wk.d.forEach(function(type,i){
       var d=dateOf(w,i),k=key(d);
       var b=document.createElement("button");
-      b.className="day "+type+(done[k]?" done":"")+(k===tKey?" is-today":"");
+      b.className="day "+type+(k===tKey?" is-today":"");mark(b,k);
       b.id="d-"+k;
       b.innerHTML="<span class='wd'>"+WD[i]+"</span><span class='dn'>"+d.getDate()+"</span><span class='tg'>"+TAG[type]+"</span>";
       b.addEventListener("click",function(){show(panel,w,i,b)});
@@ -205,13 +218,20 @@ small{color:var(--mute)}
     var h="<h4>"+WD[i]+", "+d.getDate()+" "+MON[d.getMonth()]+"</h4><p class='ph'>"+WEEKS[w].t+" · "+NAME[type]+"</p>";
     h+="<h5>Утро</h5><ol>"+morning.map(function(s){return "<li></li>"}).join("")+"</ol>";
     h+="<h5>Вечер</h5><ol>"+EVENING[type].map(function(s){return "<li></li>"}).join("")+"</ol>";
-    h+="<label class='chk'><input type='checkbox'> Сделано</label>";
+    h+="<label class='chk'><input type='checkbox' data-p='m'> Утро сделано</label><label class='chk'><input type='checkbox' data-p='e'> Вечер сделан</label>";
     p.innerHTML=h;
     var lis=p.querySelectorAll("ol");
     lis[0].querySelectorAll("li").forEach(function(li,j){li.textContent=morning[j]});
     lis[1].querySelectorAll("li").forEach(function(li,j){li.textContent=EVENING[type][j]});
-    var cb=p.querySelector("input");cb.checked=!!done[k];
-    cb.addEventListener("change",function(){if(cb.checked)done[k]=1;else delete done[k];save(done);btn.classList.toggle("done",cb.checked)});
+    p.querySelectorAll("input[data-p]").forEach(function(cb){
+      var part=cb.getAttribute("data-p"),kk=k+"-"+part;
+      cb.checked=!!done[kk];cb.parentNode.classList.toggle("on",cb.checked);
+      cb.addEventListener("change",function(){
+        if(cb.checked)done[kk]=1;else delete done[kk];
+        save(done);mark(btn,k);cb.parentNode.classList.toggle("on",cb.checked);
+        if(cb.checked)toast(done[k+"-m"]&&done[k+"-e"]?pick(PRAISE_DAY):pick(part==="m"?PRAISE_M:PRAISE_E));
+      });
+    });
     panel.appendChild(p);
     p.scrollIntoView({behavior:"smooth",block:"nearest"});
   }
