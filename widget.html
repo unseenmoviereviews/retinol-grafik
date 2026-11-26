@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Виджет «Ретинол» для iPhone</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@800&family=Inter+Tight:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#24386b">
+<style>
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#24386b;color:#fff;font:15px/1.5 "Inter Tight",-apple-system,Arial,sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.wrap{max-width:640px;margin:0 auto;padding:22px 14px 50px}
+a{color:#ffd23f}
+.back{font:500 12px "JetBrains Mono",monospace;text-transform:uppercase;text-decoration:none}
+h1{font:800 clamp(30px,9vw,46px)/.95 Unbounded,Arial,sans-serif;text-transform:uppercase;margin:16px 0 10px}
+p.sub{opacity:.85;margin:0 0 18px}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:0 0 20px}
+ol.steps li{counter-increment:s;background:#efeee9;color:#141414;padding:12px 14px 12px 50px;margin:0 0 8px;position:relative;box-shadow:5px 5px 0 rgba(0,0,0,.3)}
+ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:14px;top:12px;font:500 13px "JetBrains Mono",monospace;color:#e8352b}
+.btn{width:100%;padding:17px;border:0;background:#ffd23f;color:#141414;font:800 15px Unbounded,Arial,sans-serif;text-transform:uppercase;box-shadow:6px 6px 0 #141414;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translate(4px,4px);box-shadow:2px 2px 0 #141414}
+.ok{min-height:22px;margin:10px 0;font:500 12px "JetBrains Mono",monospace;color:#ffd23f}
+textarea{width:100%;height:260px;background:#141414;color:#d8e2ff;border:0;padding:12px;font:12px/1.45 "JetBrains Mono",monospace;-webkit-user-select:text;user-select:text}
+.note{background:rgba(0,0,0,.2);padding:12px 14px;font-size:13px;margin-top:18px}
+</style></head><body><div class="wrap">
+<a class="back" href="./">← к графику</a>
+<h1>Виджет для iPhone</h1>
+<p class="sub">Показывает день курса, вечерний уход и Базирон на сегодня, в среднем размере ещё и завтрашний день. Нажатие на виджет открывает график.</p>
+<ol class="steps">
+<li>Установите из App Store бесплатное приложение <a href="https://apps.apple.com/app/scriptable/id1405459188" style="color:#24386b">Scriptable</a>.</li>
+<li>Нажмите жёлтую кнопку ниже — код скопируется.</li>
+<li>Откройте Scriptable, нажмите «+» в правом верхнем углу, вставьте код. Нажмите на заголовок «Untitled Script» и назовите «Ретинол». Нажмите «Done».</li>
+<li>Долго жмите на пустое место экрана «Домой», затем «+» или «Изменить» → «Добавить виджет», найдите Scriptable, выберите малый или средний размер.</li>
+<li>Нажмите на появившийся виджет (в режиме редактирования) и в поле Script выберите «Ретинол».</li>
+<li>Для экрана блокировки: долго жмите на экран блокировки → «Настроить» → поле под часами → Scriptable, затем так же выберите скрипт «Ретинол».</li>
+</ol>
+<button class="btn" id="copy">Скопировать код</button>
+<div class="ok" id="ok" role="status"></div>
+<textarea id="code" readonly>// Виджет «Ретинол» для Scriptable — план ухода на сегодня
+const SITE = &quot;https://unseenmoviereviews.github.io/retinol-grafik/&quot;;
+const START = new Date(2026, 10, 23); // 23 ноября 2026
+const WEEKS = [
+  [&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;],
+  [&quot;O&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;O&quot;],
+  [&quot;R&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;],
+  [&quot;R&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;],
+  [&quot;R&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;R&quot;,&quot;R&quot;,&quot;O&quot;],
+  [&quot;R&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;,&quot;R&quot;,&quot;R&quot;,&quot;O&quot;],
+  [&quot;RR&quot;,&quot;R&quot;,&quot;O&quot;,&quot;RR&quot;,&quot;R&quot;,&quot;O&quot;,&quot;R&quot;],
+  [&quot;RR&quot;,&quot;R&quot;,&quot;O&quot;,&quot;RR&quot;,&quot;R&quot;,&quot;R&quot;,&quot;O&quot;]
+];
+const NAME = { R: &quot;Ретинол&quot;, RR: &quot;Ретинол + бустер&quot;, O: &quot;Восстановление&quot; };
+const SHORT = { R: &quot;Р&quot;, RR: &quot;Р+Б&quot;, O: &quot;В&quot; };
+const COLOR = { R: &quot;#4d6cab&quot;, RR: &quot;#1d2a55&quot;, O: &quot;#00927f&quot; };
+const YELLOW = &quot;#ffd23f&quot;;
+const WD = [&quot;Пн&quot;,&quot;Вт&quot;,&quot;Ср&quot;,&quot;Чт&quot;,&quot;Пт&quot;,&quot;Сб&quot;,&quot;Вс&quot;];
+const MON = [&quot;января&quot;,&quot;февраля&quot;,&quot;марта&quot;,&quot;апреля&quot;,&quot;мая&quot;,&quot;июня&quot;,&quot;июля&quot;,&quot;августа&quot;,&quot;сентября&quot;,&quot;октября&quot;,&quot;ноября&quot;,&quot;декабря&quot;];
+
+function info(offset) {
+  const now = new Date();
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+  const diff = Math.round((d - START) / 864e5);
+  if (diff &lt; 0 || diff &gt;= 56) return { d: d, diff: diff, out: true };
+  const w = Math.floor(diff / 7), i = diff % 7;
+  return { d: d, diff: diff, w: w, i: i, type: WEEKS[w][i], baz: w &gt;= 2 || i % 2 === 1 };
+}
+
+function txt(stack, s, size, o) {
+  o = o || {};
+  const t = stack.addText(s);
+  t.font = o.bold ? Font.boldSystemFont(size) : o.mono ? Font.boldMonospacedSystemFont(size) : Font.systemFont(size);
+  t.textColor = new Color(o.color || &quot;#ffffff&quot;, o.alpha === undefined ? 1 : o.alpha);
+  t.lineLimit = o.lines || 1;
+  t.minimumScaleFactor = 0.6;
+  return t;
+}
+
+const fam = config.widgetFamily || &quot;medium&quot;;
+const t = info(0);
+const tm = info(1);
+const w = new ListWidget();
+w.url = SITE;
+const next = new Date();
+next.setHours(24, 1, 0, 0);
+w.refreshAfterDate = next;
+
+const outMsg = t.out ? (t.diff &lt; 0 ? &quot;Старт 23 ноября&quot; : &quot;Курс завершён&quot;) : &quot;&quot;;
+const bazTxt = t.out ? &quot;&quot; : (t.baz ? &quot;Утро: Базирон&quot; : &quot;Утро: без Базирона&quot;);
+
+if (fam === &quot;accessoryInline&quot;) {
+  txt(w, t.out ? outMsg : &quot;Д&quot; + (t.diff + 1) + &quot; · &quot; + NAME[t.type] + (t.baz ? &quot; · Базирон&quot; : &quot;&quot;), 12);
+} else if (fam === &quot;accessoryCircular&quot;) {
+  w.addAccessoryWidgetBackground = true;
+  const s = w.addStack(); s.layoutVertically(); s.centerAlignContent();
+  const a = txt(s, t.out ? &quot;✓&quot; : String(t.diff + 1), 20, { bold: true }); a.centerAlignText();
+  if (!t.out) { const b = txt(s, SHORT[t.type], 11, { mono: true }); b.centerAlignText(); }
+} else if (fam === &quot;accessoryRectangular&quot;) {
+  if (t.out) { txt(w, &quot;Ретинол&quot;, 13, { bold: true }); txt(w, outMsg, 13); }
+  else {
+    txt(w, &quot;День &quot; + (t.diff + 1) + &quot; · &quot; + WD[t.i] + &quot; &quot; + t.d.getDate(), 12, { mono: true });
+    txt(w, NAME[t.type], 15, { bold: true });
+    txt(w, bazTxt, 12);
+  }
+} else {
+  w.backgroundColor = new Color(t.out ? &quot;#24386b&quot; : COLOR[t.type]);
+  w.setPadding(14, 14, 14, 14);
+  if (t.out) {
+    txt(w, &quot;РЕТИНОЛ&quot;, 12, { mono: true, color: YELLOW });
+    w.addSpacer();
+    txt(w, outMsg, 20, { bold: true, lines: 2 });
+  } else {
+    const row = w.addStack();
+    const left = row.addStack(); left.layoutVertically();
+    txt(left, &quot;ДЕНЬ &quot; + (t.diff + 1) + &quot;/56&quot;, 11, { mono: true, color: YELLOW });
+    left.addSpacer(2);
+    txt(left, WD[t.i] + &quot;, &quot; + t.d.getDate(), 26, { bold: true });
+    txt(left, MON[t.d.getMonth()], 12, { alpha: 0.8 });
+    left.addSpacer();
+    txt(left, NAME[t.type], 15, { bold: true, lines: 2 });
+    left.addSpacer(2);
+    txt(left, bazTxt, 12, { alpha: 0.9 });
+
+    if (fam !== &quot;small&quot;) {
+      row.addSpacer();
+      const r = row.addStack(); r.layoutVertically();
+      r.backgroundColor = new Color(&quot;#000000&quot;, 0.2);
+      r.cornerRadius = 12;
+      r.setPadding(10, 10, 10, 10);
+      r.size = new Size(118, 0);
+      txt(r, &quot;ЗАВТРА&quot;, 10, { mono: true, color: YELLOW });
+      r.addSpacer(4);
+      if (tm.out) { txt(r, &quot;Курс завершён&quot;, 13, { bold: true, lines: 2 }); }
+      else {
+        txt(r, WD[tm.i] + &quot;, &quot; + tm.d.getDate(), 16, { bold: true });
+        r.addSpacer(4);
+        txt(r, NAME[tm.type], 12, { lines: 2 });
+        r.addSpacer(2);
+        txt(r, tm.baz ? &quot;Базирон утром&quot; : &quot;Без Базирона&quot;, 11, { alpha: 0.8 });
+      }
+      r.addSpacer();
+    }
+  }
+}
+
+if (config.runsInWidget) Script.setWidget(w);
+else await w.presentMedium();
+Script.complete();
+</textarea>
+<div class="note">Отметки с сайта виджет не видит, он показывает только план. iOS обновляет виджет сама, обычно раз в 15–60 минут, поэтому новый день может появиться не сразу после полуночи.</div>
+</div>
+<script>
+document.getElementById("copy").addEventListener("click",function(){
+  var ta=document.getElementById("code"),ok=document.getElementById("ok");
+  function fallback(){ta.focus();ta.setSelectionRange(0,ta.value.length);try{document.execCommand("copy");ok.textContent="Скопировано. Теперь вставьте в Scriptable.";}catch(e){ok.textContent="Выделите текст в поле ниже и скопируйте вручную.";}}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(function(){ok.textContent="Скопировано. Теперь вставьте в Scriptable.";},fallback);}else fallback();
+});
+</script></body></html>
