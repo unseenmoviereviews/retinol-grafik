@@ -23,18 +23,19 @@ textarea{width:100%;height:260px;background:#141414;color:#d8e2ff;border:0;paddi
 </style></head><body><div class="wrap">
 <a class="back" href="./">← к графику</a>
 <h1>Виджет для iPhone</h1>
-<p class="sub">Показывает день курса, вечерний уход и Базирон на сегодня, в среднем размере ещё и завтрашний день. Нажатие на виджет открывает график.</p>
+<p class="sub">Большой виджет показывает все шаги на сегодня: утро и вечер по пунктам. Нажмите на блок «Утро» или «Вечер» — он отметится галочкой и станет жёлтым, а Scriptable вас похвалит.</p>
 <ol class="steps">
 <li>Установите из App Store бесплатное приложение <a href="https://apps.apple.com/app/scriptable/id1405459188" style="color:#24386b">Scriptable</a>.</li>
 <li>Нажмите жёлтую кнопку ниже — код скопируется.</li>
 <li>Откройте Scriptable, нажмите «+» в правом верхнем углу, вставьте код. Нажмите на заголовок «Untitled Script» и назовите «Ретинол». Нажмите «Done».</li>
-<li>Долго жмите на пустое место экрана «Домой», затем «+» или «Изменить» → «Добавить виджет», найдите Scriptable, выберите малый или средний размер.</li>
+<li>Долго жмите на пустое место экрана «Домой», затем «+» или «Изменить» → «Добавить виджет», найдите Scriptable, пролистайте до <b>большого</b> размера (с полным списком шагов) и нажмите «Добавить виджет».</li>
 <li>Нажмите на появившийся виджет (в режиме редактирования) и в поле Script выберите «Ретинол».</li>
+<li>Отмечать так: нажали на блок «Утро» → откроется Scriptable с похвалой → «Ок» → смахните вверх, чтобы вернуться на экран «Домой». Если код уже был вставлен раньше, замените его в Scriptable на новый целиком.</li>
 <li>Для экрана блокировки: долго жмите на экран блокировки → «Настроить» → поле под часами → Scriptable, затем так же выберите скрипт «Ретинол».</li>
 </ol>
 <button class="btn" id="copy">Скопировать код</button>
 <div class="ok" id="ok" role="status"></div>
-<textarea id="code" readonly>// Виджет «Ретинол» для Scriptable — план ухода на сегодня
+<textarea id="code" readonly>// Виджет «Ретинол» для Scriptable — уход на сегодня с галочками
 const SITE = &quot;https://unseenmoviereviews.github.io/retinol-grafik/&quot;;
 const START = new Date(2026, 10, 23); // 23 ноября 2026
 const WEEKS = [
@@ -53,6 +54,11 @@ const COLOR = { R: &quot;#4d6cab&quot;, RR: &quot;#1d2a55&quot;, O: &quot;#00927
 const YELLOW = &quot;#ffd23f&quot;;
 const WD = [&quot;Пн&quot;,&quot;Вт&quot;,&quot;Ср&quot;,&quot;Чт&quot;,&quot;Пт&quot;,&quot;Сб&quot;,&quot;Вс&quot;];
 const MON = [&quot;января&quot;,&quot;февраля&quot;,&quot;марта&quot;,&quot;апреля&quot;,&quot;мая&quot;,&quot;июня&quot;,&quot;июля&quot;,&quot;августа&quot;,&quot;сентября&quot;,&quot;октября&quot;,&quot;ноября&quot;,&quot;декабря&quot;];
+const PRAISE = {
+  m: [&quot;Утро сделано, вы молодец!&quot;, &quot;Отличное начало дня. Кожа скажет спасибо&quot;, &quot;Умница: утренний уход на месте&quot;, &quot;SPF надет, день можно начинать&quot;],
+  e: [&quot;Вечер сделан. Вы большой молодец!&quot;, &quot;Кожа восстанавливается, пока вы спите&quot;, &quot;Ещё один вечер в копилку!&quot;, &quot;Готово! Можно спокойно ложиться спать&quot;],
+  day: [&quot;Весь день закрыт. Вы просто молодец!&quot;, &quot;И утро, и вечер — идеальный день!&quot;]
+};
 
 function info(offset) {
   const now = new Date();
@@ -63,88 +69,169 @@ function info(offset) {
   return { d: d, diff: diff, w: w, i: i, type: WEEKS[w][i], baz: w &gt;= 2 || i % 2 === 1 };
 }
 
-function txt(stack, s, size, o) {
-  o = o || {};
-  const t = stack.addText(s);
-  t.font = o.bold ? Font.boldSystemFont(size) : o.mono ? Font.boldMonospacedSystemFont(size) : Font.systemFont(size);
-  t.textColor = new Color(o.color || &quot;#ffffff&quot;, o.alpha === undefined ? 1 : o.alpha);
-  t.lineLimit = o.lines || 1;
-  t.minimumScaleFactor = 0.6;
-  return t;
+function morningSteps(t) {
+  const s = [&quot;Умывание: Skinbiom или вода&quot;, &quot;Тоник ARAVIA Bio-Repair&quot;];
+  if (t.baz) s.push(&quot;Базирон АС — точечно, дать высохнуть&quot;);
+  s.push(&quot;Крем для глаз TENZERO&quot;, &quot;Гель алоэ + крем JIGOTT&quot;, &quot;SPF FRUDIA — обязательно&quot;);
+  return s;
+}
+function eveningSteps(t) {
+  const drop = t.w &lt; 2 ? &quot; — капля ~4 мм&quot; : &quot;&quot;;
+  if (t.type === &quot;R&quot;) return [&quot;Умывание Skinbiom, подождать 10–15 мин&quot;, &quot;Тонер CELIMAX Dual Barrier&quot;, &quot;Сыворотка Retinol Shot&quot; + drop, &quot;Через 5–10 мин крем JIGOTT&quot;];
+  if (t.type === &quot;RR&quot;) return [&quot;Умывание Skinbiom, подождать 10–15 мин&quot;, &quot;Бустер Retinal Shot — точечно&quot;, &quot;Сыворотка Retinol Shot — тонко&quot;, &quot;Через 5–10 мин крем JIGOTT&quot;];
+  return [&quot;Умывание Skinbiom&quot;, &quot;Тонер Dual Barrier, можно 2 слоя&quot;, &quot;Гель алоэ JIGOTT&quot;, &quot;Крем JIGOTT&quot;];
 }
 
-const fam = config.widgetFamily || &quot;medium&quot;;
+// ---------- хранение отметок ----------
+const fm = FileManager.local();
+const file = fm.joinPath(fm.documentsDirectory(), &quot;retinol-done.json&quot;);
+function load() { try { return fm.fileExists(file) ? JSON.parse(fm.readString(file)) : {}; } catch (e) { return {}; } }
+function save(o) { fm.writeString(file, JSON.stringify(o)); }
+function key(d) { return d.getFullYear() + &quot;-&quot; + (d.getMonth() + 1) + &quot;-&quot; + d.getDate(); }
+const done = load();
 const t = info(0);
-const tm = info(1);
+const tk = key(t.d);
+
+// ---------- нажатие на «Утро» / «Вечер» в виджете ----------
+const toggle = args.queryParameters &amp;&amp; args.queryParameters.toggle;
+if (toggle === &quot;m&quot; || toggle === &quot;e&quot;) {
+  const k = tk + &quot;-&quot; + toggle;
+  if (done[k]) delete done[k]; else done[k] = 1;
+  save(done);
+  const a = new Alert();
+  if (done[k]) {
+    const both = done[tk + &quot;-m&quot;] &amp;&amp; done[tk + &quot;-e&quot;];
+    const list = both ? PRAISE.day : PRAISE[toggle];
+    a.title = &quot;✦ &quot; + list[Math.floor(Math.random() * list.length)];
+    a.message = &quot;Отметка сохранена. Виджет обновится в течение нескольких минут.&quot;;
+  } else {
+    a.title = &quot;Отметка снята&quot;;
+    a.message = (toggle === &quot;m&quot; ? &quot;Утро&quot; : &quot;Вечер&quot;) + &quot; снова не отмечено.&quot;;
+  }
+  a.addAction(&quot;Ок&quot;);
+  await a.presentAlert();
+  Script.complete();
+} else {
+
+// ---------- рисование ----------
+const runURL = &quot;scriptable:///run/&quot; + encodeURIComponent(Script.name()) + &quot;?toggle=&quot;;
+const mDone = !!done[tk + &quot;-m&quot;], eDone = !!done[tk + &quot;-e&quot;];
+
+function txt(stack, s, size, o) {
+  o = o || {};
+  const x = stack.addText(s);
+  x.font = o.bold ? Font.boldSystemFont(size) : o.mono ? Font.boldMonospacedSystemFont(size) : Font.systemFont(size);
+  x.textColor = new Color(o.color || &quot;#ffffff&quot;, o.alpha === undefined ? 1 : o.alpha);
+  x.lineLimit = o.lines || 1;
+  x.minimumScaleFactor = 0.6;
+  return x;
+}
+
+function section(parent, title, steps, isDone, part) {
+  const box = parent.addStack();
+  box.layoutVertically();
+  box.backgroundColor = new Color(isDone ? YELLOW : &quot;#000000&quot;, isDone ? 0.95 : 0.2);
+  box.cornerRadius = 12;
+  box.setPadding(8, 10, 8, 10);
+  box.url = runURL + part;
+  const ink = isDone ? &quot;#141414&quot; : &quot;#ffffff&quot;;
+  const head = box.addStack();
+  head.centerAlignContent();
+  txt(head, title, 11, { mono: true, color: isDone ? &quot;#141414&quot; : YELLOW });
+  head.addSpacer();
+  txt(head, isDone ? &quot;✓ сделано&quot; : &quot;☐ отметить&quot;, 11, { bold: true, color: ink });
+  box.addSpacer(4);
+  steps.forEach(function (s, n) {
+    const row = box.addStack();
+    txt(row, (n + 1) + &quot;. &quot;, 11, { mono: true, color: ink, alpha: 0.6 });
+    txt(row, s, 12, { color: ink, alpha: isDone ? 0.7 : 1 });
+    row.addSpacer();
+    box.addSpacer(1);
+  });
+  return box;
+}
+
+const fam = config.widgetFamily || &quot;large&quot;;
 const w = new ListWidget();
 w.url = SITE;
-const next = new Date();
-next.setHours(24, 1, 0, 0);
-w.refreshAfterDate = next;
+const soon = new Date(Date.now() + 15 * 60 * 1000);
+const midnight = new Date(); midnight.setHours(24, 1, 0, 0);
+w.refreshAfterDate = soon &lt; midnight ? soon : midnight;
 
 const outMsg = t.out ? (t.diff &lt; 0 ? &quot;Старт 23 ноября&quot; : &quot;Курс завершён&quot;) : &quot;&quot;;
-const bazTxt = t.out ? &quot;&quot; : (t.baz ? &quot;Утро: Базирон&quot; : &quot;Утро: без Базирона&quot;);
+const mark = function (v) { return v ? &quot;✓&quot; : &quot;☐&quot;; };
 
 if (fam === &quot;accessoryInline&quot;) {
-  txt(w, t.out ? outMsg : &quot;Д&quot; + (t.diff + 1) + &quot; · &quot; + NAME[t.type] + (t.baz ? &quot; · Базирон&quot; : &quot;&quot;), 12);
+  txt(w, t.out ? outMsg : &quot;Д&quot; + (t.diff + 1) + &quot; · утро &quot; + mark(mDone) + &quot; · вечер &quot; + mark(eDone), 12);
 } else if (fam === &quot;accessoryCircular&quot;) {
   w.addAccessoryWidgetBackground = true;
-  const s = w.addStack(); s.layoutVertically(); s.centerAlignContent();
+  const s = w.addStack(); s.layoutVertically();
   const a = txt(s, t.out ? &quot;✓&quot; : String(t.diff + 1), 20, { bold: true }); a.centerAlignText();
-  if (!t.out) { const b = txt(s, SHORT[t.type], 11, { mono: true }); b.centerAlignText(); }
+  if (!t.out) { const b = txt(s, mark(mDone) + mark(eDone), 11); b.centerAlignText(); }
 } else if (fam === &quot;accessoryRectangular&quot;) {
   if (t.out) { txt(w, &quot;Ретинол&quot;, 13, { bold: true }); txt(w, outMsg, 13); }
   else {
-    txt(w, &quot;День &quot; + (t.diff + 1) + &quot; · &quot; + WD[t.i] + &quot; &quot; + t.d.getDate(), 12, { mono: true });
-    txt(w, NAME[t.type], 15, { bold: true });
-    txt(w, bazTxt, 12);
+    txt(w, &quot;День &quot; + (t.diff + 1) + &quot; · &quot; + NAME[t.type], 12, { bold: true });
+    txt(w, mark(mDone) + &quot; Утро&quot; + (t.baz ? &quot; · Базирон&quot; : &quot;&quot;), 12);
+    txt(w, mark(eDone) + &quot; Вечер · &quot; + SHORT[t.type], 12);
   }
 } else {
   w.backgroundColor = new Color(t.out ? &quot;#24386b&quot; : COLOR[t.type]);
-  w.setPadding(14, 14, 14, 14);
+  w.setPadding(12, 12, 12, 12);
   if (t.out) {
     txt(w, &quot;РЕТИНОЛ&quot;, 12, { mono: true, color: YELLOW });
     w.addSpacer();
     txt(w, outMsg, 20, { bold: true, lines: 2 });
   } else {
-    const row = w.addStack();
-    const left = row.addStack(); left.layoutVertically();
-    txt(left, &quot;ДЕНЬ &quot; + (t.diff + 1) + &quot;/56&quot;, 11, { mono: true, color: YELLOW });
-    left.addSpacer(2);
-    txt(left, WD[t.i] + &quot;, &quot; + t.d.getDate(), 26, { bold: true });
-    txt(left, MON[t.d.getMonth()], 12, { alpha: 0.8 });
-    left.addSpacer();
-    txt(left, NAME[t.type], 15, { bold: true, lines: 2 });
-    left.addSpacer(2);
-    txt(left, bazTxt, 12, { alpha: 0.9 });
+    const head = w.addStack();
+    head.centerAlignContent();
+    txt(head, &quot;ДЕНЬ &quot; + (t.diff + 1) + &quot;/56&quot;, 11, { mono: true, color: YELLOW });
+    head.addSpacer(8);
+    txt(head, WD[t.i] + &quot;, &quot; + t.d.getDate() + &quot; &quot; + MON[t.d.getMonth()], fam === &quot;small&quot; ? 12 : 14, { bold: true });
+    if (fam !== &quot;small&quot;) { head.addSpacer(); txt(head, NAME[t.type], 12, { alpha: 0.85 }); }
 
-    if (fam !== &quot;small&quot;) {
+    if (fam === &quot;large&quot;) {
+      w.addSpacer(8);
+      section(w, &quot;УТРО&quot;, morningSteps(t), mDone, &quot;m&quot;);
+      w.addSpacer(6);
+      section(w, &quot;ВЕЧЕР · &quot; + NAME[t.type].toUpperCase(), eveningSteps(t), eDone, &quot;e&quot;);
+      w.addSpacer();
+    } else if (fam === &quot;medium&quot;) {
+      w.addSpacer(6);
+      const row = w.addStack();
+      const m = row.addStack(); m.layoutVertically(); m.size = new Size(150, 0);
+      m.backgroundColor = new Color(mDone ? YELLOW : &quot;#000000&quot;, mDone ? 0.95 : 0.2);
+      m.cornerRadius = 12; m.setPadding(8, 10, 8, 10); m.url = runURL + &quot;m&quot;;
+      txt(m, (mDone ? &quot;✓ &quot; : &quot;☐ &quot;) + &quot;УТРО&quot;, 12, { mono: true, color: mDone ? &quot;#141414&quot; : YELLOW });
+      m.addSpacer(4);
+      txt(m, t.baz ? &quot;+ Базирон точечно&quot; : &quot;без Базирона&quot;, 12, { bold: true, color: mDone ? &quot;#141414&quot; : &quot;#ffffff&quot; });
+      txt(m, &quot;SPF обязательно&quot;, 11, { color: mDone ? &quot;#141414&quot; : &quot;#ffffff&quot;, alpha: 0.8 });
+      m.addSpacer();
       row.addSpacer();
-      const r = row.addStack(); r.layoutVertically();
-      r.backgroundColor = new Color(&quot;#000000&quot;, 0.2);
-      r.cornerRadius = 12;
-      r.setPadding(10, 10, 10, 10);
-      r.size = new Size(118, 0);
-      txt(r, &quot;ЗАВТРА&quot;, 10, { mono: true, color: YELLOW });
-      r.addSpacer(4);
-      if (tm.out) { txt(r, &quot;Курс завершён&quot;, 13, { bold: true, lines: 2 }); }
-      else {
-        txt(r, WD[tm.i] + &quot;, &quot; + tm.d.getDate(), 16, { bold: true });
-        r.addSpacer(4);
-        txt(r, NAME[tm.type], 12, { lines: 2 });
-        r.addSpacer(2);
-        txt(r, tm.baz ? &quot;Базирон утром&quot; : &quot;Без Базирона&quot;, 11, { alpha: 0.8 });
-      }
-      r.addSpacer();
+      const e = row.addStack(); e.layoutVertically(); e.size = new Size(150, 0);
+      e.backgroundColor = new Color(eDone ? YELLOW : &quot;#000000&quot;, eDone ? 0.95 : 0.2);
+      e.cornerRadius = 12; e.setPadding(8, 10, 8, 10); e.url = runURL + &quot;e&quot;;
+      txt(e, (eDone ? &quot;✓ &quot; : &quot;☐ &quot;) + &quot;ВЕЧЕР&quot;, 12, { mono: true, color: eDone ? &quot;#141414&quot; : YELLOW });
+      e.addSpacer(4);
+      txt(e, NAME[t.type], 12, { bold: true, lines: 2, color: eDone ? &quot;#141414&quot; : &quot;#ffffff&quot; });
+      txt(e, t.type === &quot;O&quot; ? &quot;без ретинола&quot; : &quot;крем через 5–10 мин&quot;, 11, { color: eDone ? &quot;#141414&quot; : &quot;#ffffff&quot;, alpha: 0.8 });
+      e.addSpacer();
+    } else {
+      w.addSpacer();
+      txt(w, NAME[t.type], 14, { bold: true, lines: 2 });
+      w.addSpacer(4);
+      txt(w, mark(mDone) + &quot; Утро&quot; + (t.baz ? &quot; + Базирон&quot; : &quot;&quot;), 12);
+      txt(w, mark(eDone) + &quot; Вечер&quot;, 12);
     }
   }
 }
 
 if (config.runsInWidget) Script.setWidget(w);
-else await w.presentMedium();
+else await w.presentLarge();
 Script.complete();
+}
 </textarea>
-<div class="note">Отметки с сайта виджет не видит, он показывает только план. iOS обновляет виджет сама, обычно раз в 15–60 минут, поэтому новый день может появиться не сразу после полуночи.</div>
+<div class="note">Отметки виджета и сайта хранятся отдельно: галочки, поставленные в виджете, на сайте не появятся, и наоборот. Иногда iOS перерисовывает виджет с задержкой в несколько минут. iOS обновляет виджет сама, обычно раз в 15–60 минут, поэтому новый день может появиться не сразу после полуночи.</div>
 </div>
 <script>
 document.getElementById("copy").addEventListener("click",function(){
